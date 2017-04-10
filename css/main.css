@@ -1,0 +1,19 @@
+body{
+  font-family: 'Open Sans', sans-serif;
+  text-align: center;
+}
+#chart{
+  background-color: #FFF;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.32), 0 3px 12px 0 rgba(0, 0, 0, 0.24);
+}
+.title{
+  color:steelblue;
+  font-size:28px;
+  padding:10px 0;
+}
+.axis path,
+.axis line{
+  fill:none;
+  stroke:#CCC;
+  shape-rendering:crispEdges;
+}
