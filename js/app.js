@@ -18,6 +18,14 @@ var svg=d3.select(".chart")
 var chart=svg.append("g")
 .attr({transform:"translate("+margin.left+","+margin.top+")"});
 
+var div=d3.select("body")
+.append("div")
+.classed("tooltip",true)
+.style("opacity",0);
+
+var colorScale=["#fa3939","#131a21"];
+var legendLabel=["Riders with doping allegations","No doping allegations"];
+
 function secToMin(time){
   var minutes=Math.floor(time/60);
   var seconds=(time-(minutes*60));
@@ -36,8 +44,7 @@ d3.json("https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/mas
   .domain([1,d3.max(cycling,function(d){return d.Place;})+5])
   .range([0,height])
   .nice();
-//  console.log(d3.extent(cycling.map(function(d){
-//                return secToMin(cycling[cycling.length-1].Seconds-d.Seconds);}));
+
   //xScale
   var last=cycling[cycling.length-1].Seconds;
   var first=cycling[0].Seconds;
@@ -59,12 +66,25 @@ d3.json("https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/mas
   chart.append("g")
   .classed("y axis",true)
   .attr("transform","translate(0,0)")
-  .call(yAxis);
+  .call(yAxis)
+  .append("text")
+  .attr({
+    dx:-70,
+    dy:20,
+    "transform":"translate(0,0) rotate(-90)"
+  })
+  .text("Ranking");
   
   chart.append("g")
   .classed("x axis",true)
   .attr("transform","translate(0,"+height+")")
-  .call(xAxis);
+  .call(xAxis)
+  .append("text")
+  .attr({
+    "transform":"translate("+width/2+","+"45)",
+    "text-anchor":"middle"
+  })
+  .text("Minutes Behind Fastest Time");
   
   chart.selectAll(".cyclists")
   .data(cycling)
@@ -82,22 +102,36 @@ d3.json("https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/mas
   chart.selectAll(".cyclists")
   .attr({
     cx:function(d){
-      
       return xScale(d.Seconds-first);
     },
     cy:function(d){
-      console.log(yScale(d.Place));
       return yScale(d.Place);
     },
     r:4,
-    fill:function(d){
+    fill:function(d,i){
       if(d.Doping!=""){
-        return "#fa3939";
+        return colorScale[0];
       }else{
-        return "#131a21";
+        return colorScale[1];
       }
     }
-  });
+  })
+  .on("mouseover",function(d){
+    div.transition()
+    .duration(50)
+    .style("opacity",0.7);
+
+    div.html("<span>"+d.Name+":"+d.Nationality+"<br>"
+              +"Year: "+d.Year+","+"Time: "+d.Time+"<br><br>"+
+              d.Doping+"</span>")
+        .style("top",height/2.5+"px")
+        .style("left",122+"px");
+  })
+  .on("mouseout",function(d){
+    div.transition()
+    .duration(50)
+    .style("opacity",0);
+  })
   
   chart.selectAll(".cyclists-label")
   .attr({
@@ -109,7 +143,7 @@ d3.json("https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/mas
     },
     dx:10,
     dy:5,
-    fill:"#131a21",
+    fill:colorScale[1],
     "font-size":"12px"
   })
   .text(function(d){
@@ -124,6 +158,53 @@ d3.json("https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/mas
   .data(cycling)
   .exit()
   .remove();
+
+  chart.selectAll(".legend")
+  .data(legendLabel)
+  .enter()
+  .append("circle")
+  .classed("legend",true);
+
+  chart.selectAll(".legend")
+  .attr({
+    cx:width-160,
+    cy:function(d,i){
+      return height/1.5+i*20;
+    },
+    r:4
+  })
+  .style("fill",function(d,i){
+    return colorScale[i];
+  })
+
+  chart.selectAll(".legend")
+  .data(legendLabel)
+  .exit()
+  .remove();
+
+  chart.selectAll(".legend-label")
+  .data(legendLabel)
+  .enter()
+  .append("text")
+  .classed("legend-label",true);
+
+  chart.selectAll(".legend-label")
+  .attr({
+    x:width-150,
+    y:function(d,i){
+      return height/1.48+i*20;
+    },
+    "font-size":"12px"
+  })
+  .text(function(d){
+    return d;
+  });
   
+
+  chart.selectAll(".legend-label")
+  .data(legendLabel)
+  .exit()
+  .remove();
+
 })
 

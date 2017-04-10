@@ -1,6 +1,7 @@
 body{
   font-family: 'Open Sans', sans-serif;
   text-align: center;
+  position: relative;
 }
 #chart{
   background-color: #FFF;
@@ -16,4 +17,16 @@ body{
   fill:none;
   stroke:#CCC;
   shape-rendering:crispEdges;
+}
+.tooltip{
+  position: absolute;
+  color:white;
+  background-color: #000;
+  width:200px;
+  height:140px;
+  padding:7px;
+  pointer-events: none;
+}
+.cyclists:hover{
+  cursor: pointer;
 }
